@@ -1,7 +1,10 @@
 import { loader } from '@monaco-editor/react';
-import * as monaco from 'monaco-editor';
 
 // Configure Monaco to use local files instead of CDN
-loader.config({ monaco });
+// Only import monaco-editor if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  import('monaco-editor').then((monaco) => {
+    loader.config({ monaco: monaco.default || monaco });
+  });
+}
 
-export default monaco;
