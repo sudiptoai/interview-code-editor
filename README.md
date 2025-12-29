@@ -15,6 +15,11 @@ A modern, interactive code editor web application built with React and TypeScrip
   - Test result summaries
 - **Unlimited Submissions**: Users can submit solutions as many times as needed
 - **Responsive Design**: Works seamlessly on different screen sizes
+- **Admin Mode**: Add and edit problems through an intuitive UI
+  - Toggle between User and Admin modes
+  - Create new coding problems with full customization
+  - Edit existing problems, descriptions, and test cases
+  - Changes persist in localStorage
 
 ## Screenshots
 
@@ -99,12 +104,35 @@ src/
 
 ## Adding New Problems
 
-To add a new coding problem, edit `src/problems.ts`:
+### Using Admin Mode (Recommended)
+
+The easiest way to add or edit problems is through the Admin Mode UI:
+
+1. **Enable Admin Mode**: Click the "👤 User" button in the top-right corner to switch to "🔧 Admin" mode
+2. **Add New Problem**: Click the "+ New Problem" button and fill in the form:
+   - Problem ID (unique identifier, e.g., "sum-two-numbers")
+   - Title and Description (supports markdown)
+   - Difficulty level and Category
+   - JavaScript and TypeScript starter code
+   - Test cases with descriptions and validation functions
+3. **Edit Existing Problems**: Click the "✏️ Edit" button on any problem card to modify:
+   - Problem description and metadata
+   - Test cases (add, remove, or modify)
+   - Starter code for both languages
+
+Problems created in Admin Mode are stored in your browser's localStorage and persist across sessions.
+
+### Manual Method
+
+Alternatively, you can add problems by editing `src/problems.ts`:
 
 ```typescript
 export const sampleProblem: Problem = {
+  id: 'your-problem-id',
   title: 'Your Problem Title',
   description: `Problem description with **markdown** support`,
+  difficulty: 'Easy',
+  category: 'DSA',
   starterCode: {
     javascript: `// Starter code for JavaScript`,
     typescript: `// Starter code for TypeScript`
