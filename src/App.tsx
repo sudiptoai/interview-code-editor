@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
@@ -9,8 +9,9 @@ import TestResults from './components/TestResults';
 import ProblemBrowser from './components/ProblemBrowser';
 import ProblemEditor from './components/ProblemEditor';
 import { Language, TestCase, Problem } from './types';
-import { problems as initialProblems } from './problems';
 import { executeCode } from './codeExecutor';
+import { useSolvedProblems, useAdminMode } from './hooks/useLocalStorage';
+import { useProblems } from './hooks/useProblems';
 
 function App() {
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
@@ -18,58 +19,13 @@ function App() {
   const [code, setCode] = useState<string>('');
   const [testResults, setTestResults] = useState<TestCase[]>([]);
   const [isExecuting, setIsExecuting] = useState(false);
-  const [solvedProblems, setSolvedProblems] = useState<Set<string>>(new Set());
-  const [isAdminMode, setIsAdminMode] = useState(false);
-  const [problems, setProblems] = useState<Problem[]>(initialProblems);
   const [editingProblem, setEditingProblem] = useState<Problem | null>(null);
   const [isCreatingProblem, setIsCreatingProblem] = useState(false);
 
-  // Load solved problems from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('solvedProblems');
-    if (saved) {
-      setSolvedProblems(new Set(JSON.parse(saved)));
-    }
-  }, []);
-
-  // Load admin mode from localStorage
-  useEffect(() => {
-    const adminMode = localStorage.getItem('isAdminMode');
-    if (adminMode === 'true') {
-      setIsAdminMode(true);
-    }
-  }, []);
-
-  // Load custom problems from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('customProblems');
-    if (saved) {
-      try {
-        const customProblems = JSON.parse(saved);
-        // Restore test case functions
-        const restoredProblems = customProblems.map((p: any) => ({
-          ...p,
-          testCases: p.testCases.map((tc: any) => ({
-            ...tc,
-            // Using Function constructor to restore serialized test functions
-            // This is necessary for dynamic problem creation but should only be used with trusted data
-            // eslint-disable-next-line no-new-func
-            fn: tc.fnCode ? new Function(`return (${tc.fnCode})`)() : () => false
-          }))
-        }));
-        setProblems([...initialProblems, ...restoredProblems]);
-      } catch (e) {
-        console.error('Error loading custom problems from localStorage. Data may be corrupted:', e);
-        // Clear corrupted data
-        localStorage.removeItem('customProblems');
-      }
-    }
-  }, []);
-
-  // Save solved problems to localStorage
-  useEffect(() => {
-    localStorage.setItem('solvedProblems', JSON.stringify(Array.from(solvedProblems)));
-  }, [solvedProblems]);
+  // Use custom hooks for state management (SRP)
+  const [solvedProblems, setSolvedProblems] = useSolvedProblems();
+  const { isAdminMode, toggleAdminMode } = useAdminMode();
+  const { problems, saveProblem } = useProblems();
 
   const handleSelectProblem = (problem: Problem) => {
     setSelectedProblem(problem);
@@ -82,11 +38,9 @@ function App() {
     setSelectedProblem(null);
   };
 
-  const toggleAdminMode = () => {
-    const newAdminMode = !isAdminMode;
-    setIsAdminMode(newAdminMode);
-    localStorage.setItem('isAdminMode', String(newAdminMode));
-    toast.info(newAdminMode ? '🔧 Admin mode enabled' : '👤 Admin mode disabled', {
+  const handleToggleAdminMode = () => {
+    toggleAdminMode();
+    toast.info(isAdminMode ? '👤 Admin mode disabled' : '🔧 Admin mode enabled', {
       position: 'top-right',
       autoClose: 2000,
     });
@@ -94,38 +48,15 @@ function App() {
 
   const handleSaveProblem = (problem: Problem) => {
     const existingIndex = problems.findIndex(p => p.id === problem.id);
-    let updatedProblems: Problem[];
+    saveProblem(problem);
     
-    if (existingIndex >= 0) {
-      // Update existing problem
-      updatedProblems = [...problems];
-      updatedProblems[existingIndex] = problem;
-      toast.success('✅ Problem updated successfully!', {
+    toast.success(
+      existingIndex >= 0 ? '✅ Problem updated successfully!' : '✅ Problem created successfully!',
+      {
         position: 'top-right',
         autoClose: 2000,
-      });
-    } else {
-      // Add new problem
-      updatedProblems = [...problems, problem];
-      toast.success('✅ Problem created successfully!', {
-        position: 'top-right',
-        autoClose: 2000,
-      });
-    }
-    
-    setProblems(updatedProblems);
-    
-    // Save custom problems to localStorage (excluding initial problems)
-    const customProblems = updatedProblems.slice(initialProblems.length);
-    const serializedProblems = customProblems.map(p => ({
-      ...p,
-      testCases: p.testCases.map(tc => ({
-        ...tc,
-        fnCode: tc.fn.toString(),
-        fn: undefined
-      }))
-    }));
-    localStorage.setItem('customProblems', JSON.stringify(serializedProblems));
+      }
+    );
     
     setEditingProblem(null);
     setIsCreatingProblem(false);
@@ -217,7 +148,7 @@ function App() {
           onSelectProblem={handleSelectProblem}
           solvedProblems={solvedProblems}
           isAdminMode={isAdminMode}
-          onToggleAdminMode={toggleAdminMode}
+          onToggleAdminMode={handleToggleAdminMode}
           onEditProblem={handleEditProblem}
           onCreateProblem={handleCreateProblem}
         />
