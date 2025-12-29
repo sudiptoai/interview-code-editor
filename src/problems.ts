@@ -620,5 +620,6 @@ function binarySearch(arr: number[], target: number): number {
   }
 ];
 
-// Keep backward compatibility
+// Export for backward compatibility with existing code
+// TODO: Consider deprecating this in favor of using problems array directly
 export const sampleProblem = problems[0];

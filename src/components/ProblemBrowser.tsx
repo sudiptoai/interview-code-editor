@@ -22,8 +22,12 @@ const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
 
   const filteredProblems = useMemo(() => {
     return problems.filter(problem => {
-      const matchesSearch = problem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          problem.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const titleLower = problem.title.toLowerCase();
+      const descLower = problem.description.toLowerCase();
+      const queryLower = searchQuery.toLowerCase();
+      
+      const matchesSearch = titleLower.includes(queryLower) ||
+                          descLower.includes(queryLower);
       const matchesCategory = selectedCategory === 'All' || problem.category === selectedCategory;
       const matchesDifficulty = selectedDifficulty === 'All' || problem.difficulty === selectedDifficulty;
       
@@ -170,7 +174,9 @@ const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
                     <span className="test-count">{problem.testCases.length} test cases</span>
                   </div>
                   <p className="problem-preview">
-                    {problem.description.split('\n')[0].substring(0, 120)}...
+                    {problem.description.split('\n')[0].length > 120
+                      ? problem.description.split('\n')[0].substring(0, 120) + '...'
+                      : problem.description.split('\n')[0]}
                   </p>
                 </div>
               ))
