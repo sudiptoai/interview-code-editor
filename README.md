@@ -157,6 +157,35 @@ export const sampleProblem: Problem = {
 - `npm test` - Run tests
 - `npm run eject` - Eject from Create React App (irreversible)
 
+## Deployment
+
+This application is automatically deployed to GitHub Pages using GitHub Actions.
+
+### Live Demo
+
+The application is available at: [https://sudiptoai.github.io/interview-code-editor](https://sudiptoai.github.io/interview-code-editor)
+
+### Automatic Deployment
+
+The deployment workflow is triggered automatically when:
+- Code is pushed to the `main` branch
+- Manually triggered via the Actions tab in GitHub
+
+### Setup Instructions
+
+To enable GitHub Pages for your fork:
+
+1. Go to your repository **Settings**
+2. Navigate to **Pages** in the left sidebar
+3. Under **Source**, select **GitHub Actions**
+4. The workflow will automatically deploy on the next push to `main`
+
+The deployment workflow:
+- Builds the React application
+- Uploads the build artifacts
+- Deploys to GitHub Pages
+- Makes the site available at `https://<username>.github.io/<repository-name>`
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
