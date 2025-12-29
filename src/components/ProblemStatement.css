@@ -1,0 +1,49 @@
+.problem-statement {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.problem-statement h2 {
+  margin-top: 0;
+  color: #2c3e50;
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.problem-description {
+  color: #34495e;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.problem-description strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.problem-description code {
+  background-color: #e8eaed;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.problem-description pre {
+  background-color: #282c34;
+  color: #abb2bf;
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+.problem-description pre code {
+  background-color: transparent;
+  padding: 0;
+  color: #abb2bf;
+}

@@ -1,0 +1,103 @@
+.test-results {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.test-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.test-results-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 20px;
+}
+
+.test-summary {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.test-summary.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.test-summary.failure {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.test-cases-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.test-case {
+  padding: 12px;
+  border-radius: 6px;
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+.test-case.pending {
+  border-color: #e0e0e0;
+  background-color: #f9f9f9;
+}
+
+.test-case.passed {
+  border-color: #28a745;
+  background-color: #d4edda;
+}
+
+.test-case.failed {
+  border-color: #dc3545;
+  background-color: #f8d7da;
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.test-case-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.test-case-icon {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.test-case-description {
+  font-size: 14px;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.test-case-error {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  font-size: 12px;
+  color: #721c24;
+  font-family: 'Courier New', monospace;
+}
