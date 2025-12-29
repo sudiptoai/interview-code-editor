@@ -6,12 +6,20 @@ interface ProblemBrowserProps {
   problems: Problem[];
   onSelectProblem: (problem: Problem) => void;
   solvedProblems: Set<string>;
+  isAdminMode: boolean;
+  onToggleAdminMode: () => void;
+  onEditProblem: (problem: Problem) => void;
+  onCreateProblem: () => void;
 }
 
 const ProblemBrowser: React.FC<ProblemBrowserProps> = ({ 
   problems, 
   onSelectProblem,
-  solvedProblems
+  solvedProblems,
+  isAdminMode,
+  onToggleAdminMode,
+  onEditProblem,
+  onCreateProblem
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<ProblemCategory | 'All'>('All');
@@ -58,7 +66,20 @@ const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
     <div className="problem-browser">
       <div className="browser-header">
         <h1>Interview Code Problems</h1>
-        <p>Select a problem to start coding</p>
+        <div className="header-actions">
+          <button 
+            className={`admin-toggle ${isAdminMode ? 'active' : ''}`}
+            onClick={onToggleAdminMode}
+            title={isAdminMode ? 'Switch to User Mode' : 'Switch to Admin Mode'}
+          >
+            {isAdminMode ? '🔧 Admin' : '👤 User'}
+          </button>
+          {isAdminMode && (
+            <button className="create-problem-btn" onClick={onCreateProblem}>
+              + New Problem
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="browser-container">
@@ -155,29 +176,46 @@ const ProblemBrowser: React.FC<ProblemBrowserProps> = ({
                 <div
                   key={problem.id}
                   className="problem-card"
-                  onClick={() => onSelectProblem(problem)}
                 >
-                  <div className="problem-header">
-                    <h3 className="problem-title">
-                      {solvedProblems.has(problem.id) && <span className="solved-check">✓</span>}
-                      {problem.title}
-                    </h3>
-                    <span 
-                      className="difficulty-badge"
-                      style={{ backgroundColor: getDifficultyColor(problem.difficulty) }}
-                    >
-                      {problem.difficulty}
-                    </span>
+                  <div 
+                    className="problem-content"
+                    onClick={() => onSelectProblem(problem)}
+                  >
+                    <div className="problem-header">
+                      <h3 className="problem-title">
+                        {solvedProblems.has(problem.id) && <span className="solved-check">✓</span>}
+                        {problem.title}
+                      </h3>
+                      <span 
+                        className="difficulty-badge"
+                        style={{ backgroundColor: getDifficultyColor(problem.difficulty) }}
+                      >
+                        {problem.difficulty}
+                      </span>
+                    </div>
+                    <div className="problem-meta">
+                      <span className="category-badge">{problem.category}</span>
+                      <span className="test-count">{problem.testCases.length} test cases</span>
+                    </div>
+                    <p className="problem-preview">
+                      {problem.description.split('\n')[0].length > 120
+                        ? problem.description.split('\n')[0].substring(0, 120) + '...'
+                        : problem.description.split('\n')[0]}
+                    </p>
                   </div>
-                  <div className="problem-meta">
-                    <span className="category-badge">{problem.category}</span>
-                    <span className="test-count">{problem.testCases.length} test cases</span>
-                  </div>
-                  <p className="problem-preview">
-                    {problem.description.split('\n')[0].length > 120
-                      ? problem.description.split('\n')[0].substring(0, 120) + '...'
-                      : problem.description.split('\n')[0]}
-                  </p>
+                  {isAdminMode && (
+                    <div className="problem-actions">
+                      <button
+                        className="edit-problem-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditProblem(problem);
+                        }}
+                      >
+                        ✏️ Edit
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))
             )}

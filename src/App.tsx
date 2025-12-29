@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
@@ -7,9 +7,11 @@ import CodeEditor from './components/CodeEditor';
 import ProblemStatement from './components/ProblemStatement';
 import TestResults from './components/TestResults';
 import ProblemBrowser from './components/ProblemBrowser';
+import ProblemEditor from './components/ProblemEditor';
 import { Language, TestCase, Problem } from './types';
-import { problems } from './problems';
 import { executeCode } from './codeExecutor';
+import { useSolvedProblems, useAdminMode } from './hooks/useLocalStorage';
+import { useProblems } from './hooks/useProblems';
 
 function App() {
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
@@ -17,20 +19,13 @@ function App() {
   const [code, setCode] = useState<string>('');
   const [testResults, setTestResults] = useState<TestCase[]>([]);
   const [isExecuting, setIsExecuting] = useState(false);
-  const [solvedProblems, setSolvedProblems] = useState<Set<string>>(new Set());
+  const [editingProblem, setEditingProblem] = useState<Problem | null>(null);
+  const [isCreatingProblem, setIsCreatingProblem] = useState(false);
 
-  // Load solved problems from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('solvedProblems');
-    if (saved) {
-      setSolvedProblems(new Set(JSON.parse(saved)));
-    }
-  }, []);
-
-  // Save solved problems to localStorage
-  useEffect(() => {
-    localStorage.setItem('solvedProblems', JSON.stringify(Array.from(solvedProblems)));
-  }, [solvedProblems]);
+  // Use custom hooks for state management (SRP)
+  const [solvedProblems, setSolvedProblems] = useSolvedProblems();
+  const { isAdminMode, toggleAdminMode } = useAdminMode();
+  const { problems, saveProblem } = useProblems();
 
   const handleSelectProblem = (problem: Problem) => {
     setSelectedProblem(problem);
@@ -41,6 +36,43 @@ function App() {
 
   const handleBackToBrowser = () => {
     setSelectedProblem(null);
+  };
+
+  const handleToggleAdminMode = () => {
+    toggleAdminMode();
+    toast.info(isAdminMode ? '👤 Admin mode disabled' : '🔧 Admin mode enabled', {
+      position: 'top-right',
+      autoClose: 2000,
+    });
+  };
+
+  const handleSaveProblem = (problem: Problem) => {
+    const existingIndex = problems.findIndex(p => p.id === problem.id);
+    saveProblem(problem);
+    
+    toast.success(
+      existingIndex >= 0 ? '✅ Problem updated successfully!' : '✅ Problem created successfully!',
+      {
+        position: 'top-right',
+        autoClose: 2000,
+      }
+    );
+    
+    setEditingProblem(null);
+    setIsCreatingProblem(false);
+  };
+
+  const handleEditProblem = (problem: Problem) => {
+    setEditingProblem(problem);
+  };
+
+  const handleCreateProblem = () => {
+    setIsCreatingProblem(true);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingProblem(null);
+    setIsCreatingProblem(false);
   };
 
   const handleLanguageChange = (newLanguage: Language) => {
@@ -96,12 +128,29 @@ function App() {
   };
 
   if (!selectedProblem) {
+    if (editingProblem || isCreatingProblem) {
+      return (
+        <>
+          <ProblemEditor
+            problem={editingProblem || undefined}
+            onSave={handleSaveProblem}
+            onCancel={handleCancelEdit}
+          />
+          <ToastContainer />
+        </>
+      );
+    }
+
     return (
       <>
         <ProblemBrowser 
           problems={problems}
           onSelectProblem={handleSelectProblem}
           solvedProblems={solvedProblems}
+          isAdminMode={isAdminMode}
+          onToggleAdminMode={handleToggleAdminMode}
+          onEditProblem={handleEditProblem}
+          onCreateProblem={handleCreateProblem}
         />
         <ToastContainer />
       </>
