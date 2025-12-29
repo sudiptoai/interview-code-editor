@@ -2,9 +2,9 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders interview code editor title', () => {
+test('renders problem browser title', () => {
   render(<App />);
-  const titleElement = screen.getByText(/interview code editor/i);
+  const titleElement = screen.getByText(/interview code problems/i);
   expect(titleElement).toBeInTheDocument();
 });
 
@@ -14,9 +14,9 @@ test('renders problem statement', () => {
   expect(problemElement).toBeInTheDocument();
 });
 
-test('renders submit button', () => {
+test('renders progress dashboard', () => {
   render(<App />);
-  const submitButton = screen.getByText(/Submit Solution/i);
-  expect(submitButton).toBeInTheDocument();
+  const progressElement = screen.getByText(/Your Progress/i);
+  expect(progressElement).toBeInTheDocument();
 });
 
